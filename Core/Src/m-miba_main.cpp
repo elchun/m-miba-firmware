@@ -60,7 +60,7 @@ int mmiba_main(void) {
                 SER1_GPIO_Port, SER1_Pin, SRCLR_GPIO_Port, SRCLR_Pin);
   shiftRegister->clear();
 
-  uint8_t num_sensors = 36;
+  uint8_t num_sensors = 1;
   //
   std::vector<SensorData> sensorList;
 
@@ -75,7 +75,8 @@ int mmiba_main(void) {
   uint32_t elapsedTime = 0;
   uint16_t sample_data;
 
-  uint8_t data_buffer[num_sensors * 2];
+  uint8_t NUM_SENSORS_EXPECTED = 36;
+  uint8_t data_buffer[NUM_SENSORS_EXPECTED * 2] = {0};
   uint8_t eol[4] = {0xFF, 0xFF, 0xFF, 0xFF};
   uint8_t time_buffer[4];
 
@@ -98,12 +99,14 @@ int mmiba_main(void) {
       for (int i = 0; i < num_sensors; ++i) {
         sensorList[i].Sample();
         sample_data = sensorList[i].raw_data[0];
+//        printf("%d ", sample_data);
         data_buffer[2 * i] = ((sample_data >> 8) & 0xFF);
         data_buffer[2 * i + 1] = (sample_data & 0xFF);
       }
+//      printf("\n");
 
       // Send data buffer
-      HAL_UART_Transmit(&huart3, data_buffer, num_sensors * 2,
+      HAL_UART_Transmit(&huart3, data_buffer, NUM_SENSORS_EXPECTED * 2,
                         HAL_MAX_DELAY);  // This was 779
 
       // Calculate elapsed time
