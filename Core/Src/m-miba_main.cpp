@@ -60,7 +60,7 @@ int mmiba_main(void) {
                 SER1_GPIO_Port, SER1_Pin, SRCLR_GPIO_Port, SRCLR_Pin);
   shiftRegister->clear();
 
-  uint8_t num_sensors = 1;
+  uint8_t num_sensors = 36;
   //
   std::vector<SensorData> sensorList;
 
