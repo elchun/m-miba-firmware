@@ -76,7 +76,8 @@ void SensorData::config_dev(struct bmp5_dev *dev) {
 void SensorData::Sample() {
     bmp5_get_sensor_data(&data, &osr_config, &s);
 
-    raw_data[0] = int(data.pressure) - 100000;
+    // Min measured pressure is 70000
+    raw_data[0] = int(data.pressure) - 70000;  // So there are no negatives...
 //    offset_data[0] = raw_data[0] - offsets[0];
 }
 
