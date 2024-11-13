@@ -62,7 +62,9 @@ void SensorData::Sample()
     int8_t rslt;
 //    struct bmp5_sensor_data sensor_data;
 
-    rslt = bmp5_set_power_mode(BMP5_POWERMODE_FORCED, &s);
+//    rslt = bmp5_set_power_mode(BMP5_POWERMODE_FORCED, &s);
+//    rslt = bmp5_set_power_mode(BMP5_POWERMODE_CONTINOUS, &s);
+
     rslt = bmp5_get_sensor_data(&data, &osr_config, &s);
 
     raw_data[0] = int(data.pressure) - 70000;  // So there are no negatives...
