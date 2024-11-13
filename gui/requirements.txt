@@ -1,0 +1,4 @@
+fonttools
+matplotlib
+numpy
+pyserial

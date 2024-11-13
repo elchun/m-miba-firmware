@@ -69,7 +69,7 @@ int mmiba_main(void) {
     sensorList.emplace_back(i + 1);
     sensorList[i].Initialize();
     HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
-    HAL_Delay(50);
+    HAL_Delay(10);
   }
 
   uint32_t elapsedTime = 0;
