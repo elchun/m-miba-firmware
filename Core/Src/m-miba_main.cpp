@@ -37,7 +37,9 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
  *
  */
 int mmiba_main(void) {
-  printf("Hello World!\n\r");
+  HAL_GPIO_WritePin(LD1_GPIO_Port, LD1_Pin, GPIO_PIN_RESET);
+
+
   CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;  // Enable DWT access
   DWT->CYCCNT = 0;                                 // Reset the cycle counter
   DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;             // Enable the cycle counter
@@ -63,9 +65,11 @@ int mmiba_main(void) {
   std::vector<SensorData> sensorList;
 
   for (int i = 0; i < num_sensors; ++i) {
+	HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_SET);
     sensorList.emplace_back(i + 1);
     sensorList[i].Initialize();
-    HAL_Delay(100);
+    HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
+    HAL_Delay(50);
   }
 
   uint32_t elapsedTime = 0;
@@ -77,6 +81,9 @@ int mmiba_main(void) {
 
   // Interrupt init before setup
   HAL_TIM_Base_Start_IT(&htim5);
+
+  printf("DATA_BEGIN\n\r");
+  HAL_GPIO_WritePin(LD1_GPIO_Port, LD1_Pin, GPIO_PIN_SET);
 
   while (1) {
     if (INTERRUPT_FLAG) {
@@ -114,6 +121,7 @@ int mmiba_main(void) {
 
       // Transmit eol buffer
       HAL_UART_Transmit(&huart3, eol, 4, HAL_MAX_DELAY);  // This was 779
+
     }
   }
 }
