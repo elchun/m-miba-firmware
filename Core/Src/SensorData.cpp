@@ -21,59 +21,40 @@ void SensorData::config_dev(struct bmp5_dev *dev) {
     dev->delay_us = &bmp_delay_us;
 //    dev->delay_us = &HAL_Delay;
 
-    HAL_Delay(1);
-//    rslt = bmp5_soft_reset(dev);
-//    printf("bmp5 soft reset result: %d\n \r", rslt);
-//    HAL_Delay(1000);
 
-
-//    while(1){
-//    uint8_t dev_id;
-//    rslt = bmp_spi1_read(s.dev_id, 0x81, &dev_id, 1, &s);
-//    printf("Device ID: 0x%02X, read result: %d\n \r", dev_id, rslt);
-//    }
-//    enum bmp5_powermode power_mode;
-//    rslt = bmp5_get_power_mode(&power_mode, dev);
-//    printf("Power mode after reset: %d, result: %d\n \r", power_mode, rslt);
-
-//    uint8_t nvm_status;
-
-//    rslt = get_nvm_status(&nvm_status, dev);
-//    printf("nvm_status: %d, result: %d\n \r", nvm_status, rslt);
-
-
+    // Init init
     rslt = bmp5_init(dev);
-//    printf("bmp5_init result: %d\n \r", rslt);
-    HAL_Delay(5);
+    printf("bmp5_init result: %d\n \r", rslt);
+
     if (rslt == BMP5_OK) {
-        enum bmp5_powermode check_pwr;
-        rslt = bmp5_get_power_mode(&check_pwr, dev);
-//        printf("* Power mode before = 0x%x *\n", check_pwr);
-
-        rslt = bmp5_set_osr_odr_press_config(&osr_config, dev);
-
-        if (rslt == BMP5_OK) {
-            rslt = bmp5_set_power_mode(BMP5_POWERMODE_CONTINOUS, dev);
-            HAL_Delay(1);  // Delay 1 ms
-            bmp5_get_power_mode(&check_pwr, dev);
-//            printf("* Power mode after = 0x%x *\n", check_pwr);
-
-            HAL_Delay(10);  // Delay 10 ms
-            if (rslt != BMP5_OK) {
-                printf("Error on power mode setup.\n\r");
-            }else{
-            	printf("done.\n\r");
-            }
-        } else {
-            printf("Error on settings setup.\n\r");
-        }
+    	printf("Init passed\n");
     } else {
-        printf("Error on initialization.\n \r");
+    	printf("Error on initialization.\n \r");
+    }
+
+
+    // osr odr setup
+    rslt = bmp5_set_osr_odr_press_config(&osr_config, dev);
+
+    if (rslt == BMP5_OK) {
+    	printf("Settings setup passed\n\r");
+    } else {
+    	printf("Error on settings setup.\n\r");
+    }
+
+    // Powermode setup
+    rslt = bmp5_set_power_mode(BMP5_POWERMODE_CONTINOUS, dev);
+    if (rslt == BMP5_OK) {
+    	printf("Power setup passed\n\r");
+
+    } else {
+    	printf("Error on power mode setup.\n\r");
     }
 
 }
 
 void SensorData::Sample() {
+//	bmp5_set_power_mode(BMP5_POWERMODE_CONTINOUS, &s);
     bmp5_get_sensor_data(&data, &osr_config, &s);
 
     // Min measured pressure is 70000
