@@ -7,7 +7,7 @@ def clear_screen():
 
 
 def serial_reader():
-    ser = serial.Serial(port="/dev/tty.usbmodem11403", baudrate=921600, timeout=1.0)
+    ser = serial.Serial(port="/dev/tty.usbmodem1103", baudrate=921600, timeout=1.0)
 
     if ser.isOpen():
         print(f"Serial port {ser.port} is open.")

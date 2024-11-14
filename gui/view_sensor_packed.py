@@ -10,7 +10,7 @@ def clear_screen():
 
 def serial_reader(done_flag: multiprocessing.Value, data_queue: multiprocessing.Queue, sample_time: float = 1/100):
     ser = serial.Serial(
-        port='/dev/tty.usbmodem11403',
+        port='/dev/tty.usbmodem1103',
         baudrate=921600,
         timeout=1
     )
@@ -87,10 +87,9 @@ def get_color_code(r, g, b):
     return f"\033[38;2;{r};{g};{b}m"
 
 
-def get_line_string(line, cm_array):
-    min_pressure = 70000
-    max_pressure = 70000 + 2**16
-
+def get_line_string(line, cm_array, min_pressure=102000, max_pressure = 130000):
+    # min_pressure = 70000
+    # max_pressure = 70000 + 2**16
     # return " ".join([f"{val:.1f}" for val in line]) + "\n"
 
     str = []
@@ -102,7 +101,7 @@ def get_line_string(line, cm_array):
         color_rgb = cm_array[color_idx]
         color_ansi = get_color_code(*color_rgb)
         # str.append(f"{color_ansi}{val:.1f}\033[38;2;0m" + " ")
-        str.append(f"{color_ansi}{val:05} ")
+        str.append(f"{color_ansi}{val:06} ")
     str = "".join(str) + "\n"
 
     # print(cm_array[0])
@@ -120,16 +119,43 @@ def plotting_target(done_flag: multiprocessing.Value, data_queue: multiprocessin
     cnt = 0
     start_time = time.time()
     hz = 0
+    old_max = 0
+    was_max = 0
+    prev_data_arr = np.zeros(3 * sensors_per_line)
     while done_flag.value == 0:
 
         data = data_queue.get()
         line1 = data[:sensors_per_line]
         line2 = data[sensors_per_line:2 * sensors_per_line]
         line3 = data[2 * sensors_per_line:3 * sensors_per_line]
-        line1_str = get_line_string(line1, cm_array)
-        line2_str = get_line_string(line2, cm_array)
-        line3_str = get_line_string(line3, cm_array)
+
+        min_pressure = 100000
+        max_pressure = 130000
+        line1_str = get_line_string(line1, cm_array, min_pressure, max_pressure)
+        line2_str = get_line_string(line2, cm_array, min_pressure, max_pressure)
+        line3_str = get_line_string(line3, cm_array, min_pressure, max_pressure)
+
         clear_screen()
+
+        data_arr = np.array(data[:3 * sensors_per_line])
+
+        diff = data_arr - prev_data_arr
+        prev_data_arr = data_arr
+
+        diff_str1 = get_line_string(diff[:sensors_per_line], cm_array, -10, 10)
+        diff_str2 = get_line_string(diff[sensors_per_line:2 * sensors_per_line], cm_array, -10, 10)
+        diff_str3 = get_line_string(diff[2 * sensors_per_line:3 * sensors_per_line], cm_array, -10, 10)
+
+        if max(diff) > 20:
+            was_max = 50
+
+        if was_max:
+            print("\033[38;2;255;0;0mCONTACT!\033[38;0m")
+            was_max -= 1
+        else:
+            print("")
+
+
         # print(" ".join(line1))
         # print(" ".join(line2))
         # print(" ".join(line3))
@@ -138,6 +164,10 @@ def plotting_target(done_flag: multiprocessing.Value, data_queue: multiprocessin
         print(line3_str, end="")
         print(f"\033[38;2;0;0;0m{data[-1]} us")
         print(f"Hz: {hz}")
+        print(diff_str1, end="")
+        print(diff_str2, end="")
+        print(diff_str3, end="")
+
         print(f"\033[0m", end="")  # Reset color
 
         cnt += 1
