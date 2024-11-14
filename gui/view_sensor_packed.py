@@ -142,11 +142,13 @@ def plotting_target(done_flag: multiprocessing.Value, data_queue: multiprocessin
         diff = data_arr - prev_data_arr
         prev_data_arr = data_arr
 
-        diff_str1 = get_line_string(diff[:sensors_per_line], cm_array, -10, 10)
-        diff_str2 = get_line_string(diff[sensors_per_line:2 * sensors_per_line], cm_array, -10, 10)
-        diff_str3 = get_line_string(diff[2 * sensors_per_line:3 * sensors_per_line], cm_array, -10, 10)
+        min_diff_color = -100
+        max_diff_color = 100
+        diff_str1 = get_line_string(diff[:sensors_per_line], cm_array, min_diff_color, max_diff_color)
+        diff_str2 = get_line_string(diff[sensors_per_line:2 * sensors_per_line], cm_array, min_diff_color, max_diff_color)
+        diff_str3 = get_line_string(diff[2 * sensors_per_line:3 * sensors_per_line], cm_array, min_diff_color, max_diff_color)
 
-        if max(diff) > 20:
+        if max(diff) > 40:
             was_max = 50
 
         if was_max:
