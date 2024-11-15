@@ -1,6 +1,8 @@
 #include "SensorData.h"
 #include "main.h"
 
+//#define BMP5_USE_FIXED_POINT
+
 SensorData::SensorData(int sensor_number) {
     _sensor = sensor_number;
     sensor_comp = uint8_t(1);
@@ -53,14 +55,20 @@ void SensorData::config_dev(struct bmp5_dev *dev) {
 
 }
 
-void SensorData::Sample() {
-//	bmp5_set_power_mode(BMP5_POWERMODE_CONTINOUS, &s);
-    bmp5_get_sensor_data(&data, &osr_config, &s);
 
-    // Min measured pressure is 70000
+//static int8_t get_sensor_data(const struct bmp5_osr_odr_press_config *osr_odr_press_cfg, struct bmp5_dev *dev)
+void SensorData::Sample()
+{
+    int8_t rslt;
+//    struct bmp5_sensor_data sensor_data;
+
+    rslt = bmp5_set_power_mode(BMP5_POWERMODE_FORCED, &s);
+    rslt = bmp5_get_sensor_data(&data, &osr_config, &s);
+
     raw_data[0] = int(data.pressure) - 70000;  // So there are no negatives...
-//    offset_data[0] = raw_data[0] - offsets[0];
 }
+
+
 
 void SensorData::Calibrate() {
     printf("Calculating sensor offsets.\n");
