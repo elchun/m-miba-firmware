@@ -1,6 +1,8 @@
 #include "SensorData.h"
 #include "main.h"
 
+#define BMP5_USE_FIXED_POINT
+
 SensorData::SensorData(int sensor_number) {
     _sensor = sensor_number;
     sensor_comp = uint8_t(1);
@@ -55,7 +57,8 @@ void SensorData::config_dev(struct bmp5_dev *dev) {
 
 void SensorData::Sample() {
 //	bmp5_set_power_mode(BMP5_POWERMODE_CONTINOUS, &s);
-    bmp5_get_sensor_data(&data, &osr_config, &s);
+//    bmp5_get_sensor_data(&data, &osr_config, &s);
+    bmp5_get_sensor_data_ponly(&data, &osr_config, &s);
 
     // Min measured pressure is 70000
     raw_data[0] = int(data.pressure) - 70000;  // So there are no negatives...

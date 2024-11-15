@@ -2145,3 +2145,70 @@ static int8_t get_nvm_status(uint8_t *nvm_status, struct bmp5_dev *dev)
 
     return rslt;
 }
+
+// CUSTOM DRIVERS
+
+/*!
+ *  @brief This API reads the temperature(deg C) or both pressure(Pa) and temperature(deg C) data from the
+ * sensor and store it in the bmp5_sensor_data structure instance passed by the user.
+ */
+int8_t bmp5_get_sensor_data_ponly(struct bmp5_sensor_data *sensor_data,
+                            const struct bmp5_osr_odr_press_config *osr_odr_press_cfg,
+                            struct bmp5_dev *dev)
+{
+    int8_t rslt;
+    uint8_t reg_data[6] = { 0 };
+    uint32_t raw_data_p;
+
+    rslt = bmp5_get_regs(BMP5_REG_PRESS_DATA_XLSB, reg_data, 3, dev);
+
+    if (rslt == BMP5_OK)
+    {
+        if (osr_odr_press_cfg->press_en == BMP5_ENABLE)
+        {
+            raw_data_p = (uint32_t)((uint32_t)(reg_data[2] << 16) | (uint16_t)(reg_data[1] << 8) | reg_data[0]);
+
+#ifdef BMP5_USE_FIXED_POINT
+
+            /* Division by 2^6(whose equivalent value is 64) is performed to get pressure data and followed by fixed point digit
+             * precision in Pa
+             */
+            sensor_data->pressure =
+                (uint64_t)((raw_data_p / (float)64.0) * (power(10, BMP5_FIXED_POINT_DIGIT_PRECISION)));
+#else
+
+            /* Division by 2^6(whose equivalent value is 64) is performed to get pressure data in Pa */
+            sensor_data->pressure = (float)(raw_data_p / 64.0);
+#endif
+        }
+        else
+        {
+            sensor_data->pressure = 0.0;
+        }
+    }
+
+    return rslt;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

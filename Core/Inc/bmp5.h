@@ -624,6 +624,15 @@ int8_t bmp5_nvm_read(uint8_t nvm_addr, uint16_t *nvm_data, struct bmp5_dev *dev)
  */
 int8_t bmp5_nvm_write(uint8_t nvm_addr, const uint16_t *nvm_data, struct bmp5_dev *dev);
 
+
+
+// CUSTOM DRIVERS
+int8_t bmp5_get_sensor_data_ponly(struct bmp5_sensor_data *sensor_data,
+                            const struct bmp5_osr_odr_press_config *osr_odr_press_cfg,
+                            struct bmp5_dev *dev);
+
+
+
 #ifdef __cplusplus
 }
 #endif /* End of CPP guard */
