@@ -1,3 +1,4 @@
+from collections import deque
 import multiprocessing
 import serial
 import time
@@ -122,6 +123,12 @@ def plotting_target(done_flag: multiprocessing.Value, data_queue: multiprocessin
     old_max = 0
     was_max = 0
     prev_data_arr = np.zeros(3 * sensors_per_line)
+
+    n_diff_history = 20
+    diff_queue = deque()
+    for _ in range(n_diff_history):
+        diff_queue.append(np.zeros(3 * sensors_per_line))
+
     while done_flag.value == 0:
 
         data = data_queue.get()
@@ -139,8 +146,11 @@ def plotting_target(done_flag: multiprocessing.Value, data_queue: multiprocessin
 
         data_arr = np.array(data[:3 * sensors_per_line])
 
-        diff = data_arr - prev_data_arr
-        prev_data_arr = data_arr
+        diff = data_arr - diff_queue.popleft()
+        diff_queue.append(data_arr)
+        
+        # diff = data_arr - prev_data_arr
+        # prev_data_arr = data_arr
 
         min_diff_color = -100
         max_diff_color = 100
@@ -148,7 +158,8 @@ def plotting_target(done_flag: multiprocessing.Value, data_queue: multiprocessin
         diff_str2 = get_line_string(diff[sensors_per_line:2 * sensors_per_line], cm_array, min_diff_color, max_diff_color)
         diff_str3 = get_line_string(diff[2 * sensors_per_line:3 * sensors_per_line], cm_array, min_diff_color, max_diff_color)
 
-        if max(diff) > 40:
+
+        if max(diff) > 5:
             was_max = 50
 
         if was_max:
