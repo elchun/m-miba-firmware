@@ -45,7 +45,9 @@ void SensorData::config_dev(struct bmp5_dev *dev) {
     }
 
     // Powermode setup
+//    rslt = bmp5_set_power_mode(BMP5_POWERMODE_STANDBY, dev);
     rslt = bmp5_set_power_mode(BMP5_POWERMODE_CONTINOUS, dev);
+
     if (rslt == BMP5_OK) {
     	printf("Power setup passed\n\r");
 
@@ -59,13 +61,18 @@ void SensorData::config_dev(struct bmp5_dev *dev) {
 //static int8_t get_sensor_data(const struct bmp5_osr_odr_press_config *osr_odr_press_cfg, struct bmp5_dev *dev)
 void SensorData::Sample()
 {
+	// 5682 for normal set_power_mode
+	// 4876 for unsafe set power mode
     int8_t rslt;
 //    struct bmp5_sensor_data sensor_data;
 
-    rslt = bmp5_set_power_mode(BMP5_POWERMODE_FORCED, &s);
+//    rslt = bmp5_set_power_mode(BMP5_POWERMODE_FORCED, &s);
 //    rslt = bmp5_set_power_mode(BMP5_POWERMODE_CONTINOUS, &s);
+//
+//    rslt = set_power_mode(BMP5_POWERMODE_FORCED, &s);
 
     rslt = bmp5_get_sensor_data(&data, &osr_config, &s);
+
 
 //void SensorData::Sample() {
 //    bmp5_get_sensor_data(&data, &osr_config, &s);

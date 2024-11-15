@@ -568,6 +568,8 @@ int8_t bmp5_set_power_mode(enum bmp5_powermode powermode, struct bmp5_dev *dev)
     /* Existing power mode of the device is received in lst_pwrmode */
     rslt = bmp5_get_power_mode(&lst_pwrmode, dev);
 
+//    rslt = 0;
+//    lst_pwrmode = BMP5_POWERMODE_STANDBY;
     if (rslt == BMP5_OK)
     {
         /* If the sensor is not in standby mode set the device to
@@ -629,28 +631,32 @@ int8_t bmp5_get_sensor_data(struct bmp5_sensor_data *sensor_data,
     int32_t raw_data_t;
     uint32_t raw_data_p;
 
-    rslt = bmp5_get_regs(BMP5_REG_TEMP_DATA_XLSB, reg_data, 6, dev);
+//    rslt = bmp5_get_regs(BMP5_REG_TEMP_DATA_XLSB, reg_data, 6, dev);
+    rslt = bmp5_get_regs(BMP5_REG_PRESS_DATA_XLSB, reg_data, 3, dev);
+
 
     if (rslt == BMP5_OK)
     {
-        raw_data_t = (int32_t) ((int32_t) ((uint32_t)(((uint32_t)reg_data[2] << 16) | ((uint16_t)reg_data[1] << 8) | reg_data[0]) << 8) >> 8);
-
-#ifdef BMP5_USE_FIXED_POINT
-
-        /* Division by 2^16(whose equivalent value is 65536) is performed to get temperature data and followed by fixed point digit
-         * precision in deg C
-         */
-        sensor_data->temperature =
-            (int64_t)((raw_data_t / (float)65536.0) * (power(10, BMP5_FIXED_POINT_DIGIT_PRECISION)));
-#else
-
-        /* Division by 2^16(whose equivalent value is 65536) is performed to get temperature data in deg C */
-        sensor_data->temperature = (float)(raw_data_t / 65536.0);
-#endif
+//        raw_data_t = (int32_t) ((int32_t) ((uint32_t)(((uint32_t)reg_data[2] << 16) | ((uint16_t)reg_data[1] << 8) | reg_data[0]) << 8) >> 8);
+//
+//#ifdef BMP5_USE_FIXED_POINT
+//
+//        /* Division by 2^16(whose equivalent value is 65536) is performed to get temperature data and followed by fixed point digit
+//         * precision in deg C
+//         */
+//        sensor_data->temperature =
+//            (int64_t)((raw_data_t / (float)65536.0) * (power(10, BMP5_FIXED_POINT_DIGIT_PRECISION)));
+//#else
+//
+//        /* Division by 2^16(whose equivalent value is 65536) is performed to get temperature data in deg C */
+//        sensor_data->temperature = (float)(raw_data_t / 65536.0);
+//#endif
 
         if (osr_odr_press_cfg->press_en == BMP5_ENABLE)
         {
-            raw_data_p = (uint32_t)((uint32_t)(reg_data[5] << 16) | (uint16_t)(reg_data[4] << 8) | reg_data[3]);
+//            raw_data_p = (uint32_t)((uint32_t)(reg_data[5] << 16) | (uint16_t)(reg_data[4] << 8) | reg_data[3]);
+            raw_data_p = (uint32_t)((uint32_t)(reg_data[2] << 16) | (uint16_t)(reg_data[1] << 8) | reg_data[0]);
+
 
 #ifdef BMP5_USE_FIXED_POINT
 
